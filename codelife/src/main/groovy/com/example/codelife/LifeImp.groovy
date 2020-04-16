@@ -48,7 +48,7 @@ class LifeImp extends Transform implements Plugin<Project> {
 
     @Override
     boolean isIncremental() {
-        return false
+        return true
     }
 
     @Override
@@ -87,16 +87,19 @@ class LifeImp extends Transform implements Plugin<Project> {
             directoryInput.file.eachFileRecurse { File file ->
                 def name = file.name
                 if (checkClassFile(name)) {
-                    println '----------- deal with "class" file <' + name + '> -----------'
+
                     ClassReader classReader = new ClassReader(file.bytes)
-                    ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
-                    ClassVisitor cv = new LifecycleClassVisitor(classWriter)
-                    classReader.accept(cv, EXPAND_FRAMES)
-                    byte[] code = classWriter.toByteArray()
-                    FileOutputStream fos = new FileOutputStream(
-                            file.parentFile.absolutePath + File.separator + name)
-                    fos.write(code)
-                    fos.close()
+                    if(classReader.superName.contains("Activity")) {
+                        println 'directory: <' + name + '> -----------'
+                        ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
+                        ClassVisitor cv = new LifecycleClassVisitor(classWriter)
+                        classReader.accept(cv, EXPAND_FRAMES)
+                        byte[] code = classWriter.toByteArray()
+                        FileOutputStream fos = new FileOutputStream(
+                                file.parentFile.absolutePath + File.separator + name)
+                        fos.write(code)
+                        fos.close()
+                    }
                 }
             }
         }
@@ -129,20 +132,23 @@ class LifeImp extends Transform implements Plugin<Project> {
             //用于保存
             while (enumeration.hasMoreElements()) {
                 JarEntry jarEntry = (JarEntry) enumeration.nextElement()
+
                 String entryName = jarEntry.getName()
                 ZipEntry zipEntry = new ZipEntry(entryName)
                 InputStream inputStream = jarFile.getInputStream(jarEntry)
-                println '-----------  <' + entryName + '> -----------'
                 //插桩class
                 if (checkClassFile(entryName)) {
                     //class文件处理
                     jarOutputStream.putNextEntry(zipEntry)
                     ClassReader classReader = new ClassReader(IOUtils.toByteArray(inputStream))
-                    ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
-                    ClassVisitor cv = new LifecycleClassVisitor(classWriter)
-                    classReader.accept(cv, EXPAND_FRAMES)
-                    byte[] code = classWriter.toByteArray()
-                    jarOutputStream.write(code)
+                    if(classReader.superName.contains("Activity")) {
+                        println 'directory: <' + entryName + '> -----------'
+                        ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
+                        ClassVisitor cv = new LifecycleClassVisitor(classWriter)
+                        classReader.accept(cv, EXPAND_FRAMES)
+                        byte[] code = classWriter.toByteArray()
+                        jarOutputStream.write(code)
+                    }
                 } else {
                     jarOutputStream.putNextEntry(zipEntry)
                     jarOutputStream.write(IOUtils.toByteArray(inputStream))
@@ -166,8 +172,7 @@ class LifeImp extends Transform implements Plugin<Project> {
      */
     static boolean checkClassFile(String name) {
         //只处理需要的class文件
-        return (name.endsWith(".class") && !name.startsWith("R\$")
-                && !"R.class".equals(name) && !"BuildConfig.class".equals(name)
-                && "androidx/appcompat/app/AppCompatActivity.class".equals(name))
+        return (!(name.startsWith("android") || name.startsWith("androidx")) &&name.endsWith("Activity.class") && !name.startsWith("R\$")
+                && !"R.class".equals(name) && !"BuildConfig.class".equals(name))
     }
 }
