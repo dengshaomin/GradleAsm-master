@@ -31,10 +31,10 @@ public class LifecycleClassVisitor extends ClassVisitor implements Opcodes {
 
         if ("onCreate".equals(name)) {
             //处理onCreate
-            return new LifecycleOnCreateMethodVisitor(mv);
+            return new TimeRecordStartVisitor(mv);
         } else if ("onDestroy".equals(name)) {
             //处理onDestroy
-            return new LifecycleOnDestroyMethodVisitor(mv);
+            return new TimeRecordEndVisitor(mv);
         }
 
         return mv;
