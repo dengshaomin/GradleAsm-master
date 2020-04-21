@@ -2,13 +2,16 @@ package com.example.myapplication;
 
 import android.util.Log;
 
-public class AsmClass1 {
-    void oncreate(){
-        TimeRecoder.onStart(this.getClass());
-    }
+import com.example.march.March;
 
-    void oncreate1(){
-        TimeRecoder.onDestory(this.getClass());
+public class AsmClass1 {
+
+
+    public void fuck(){
+        registerComponent("1213");
+    }
+    void registerComponent(String name){
+
     }
 
 }

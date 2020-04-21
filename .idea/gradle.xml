@@ -11,7 +11,11 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/basecomponent" />
             <option value="$PROJECT_DIR$/codelife" />
+            <option value="$PROJECT_DIR$/componenta" />
+            <option value="$PROJECT_DIR$/componentb" />
+            <option value="$PROJECT_DIR$/march" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

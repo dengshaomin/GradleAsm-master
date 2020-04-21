@@ -1,2 +1,6 @@
 include ':app', ':codelife'
 rootProject.name='My Application'
+include ':march'
+include ':componenta'
+include ':componentb'
+include ':basecomponent'
